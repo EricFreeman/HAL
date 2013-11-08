@@ -2,19 +2,23 @@
 using System.Diagnostics;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
-using System.Windows;
 
 namespace HAL
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
+        #region Private Properties
+
         private readonly SpeechRecognitionEngine _recognizer;
 
         private readonly Grammar _startGrammar;
         private readonly Grammar _endGrammar;
 
         private readonly Grammar _dateAndTimeGrammar;
-        private readonly Grammar _birthdayGrammar;
+
+        #endregion
+
+        #region Constructor
 
         public MainWindow()
         {
@@ -33,6 +37,26 @@ namespace HAL
             _recognizer.SpeechHypothesized += recognizer_SpeechHypothesized;
             _recognizer.RecognizeAsync(RecognizeMode.Multiple);
         }
+
+        #endregion
+
+        #region Helper Methods
+
+        private void Talk(string message)
+        {
+            var ss = new SpeechSynthesizer();
+            ss.Speak(message);
+            Log("Speaking: " + message);
+        }
+
+        private void Log(string message)
+        {
+            LogViewer.Text += message + "\r\n";
+        }
+
+        #endregion
+
+        #region Create Grammars
 
         private Grammar CreateStartGrammar()
         {
@@ -95,9 +119,13 @@ namespace HAL
             return new Grammar(b);
         }
 
+        #endregion
+
+        #region Recognizer Events
+
         private void recognizer_SpeechHypothesized(object sender, SpeechHypothesizedEventArgs e)
         {
-            Debug.Write(e.Result.Text);
+            Log("Hypothesis: " + e.Result.Text);
         }
 
         private void recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
@@ -109,7 +137,6 @@ namespace HAL
                 if (!_recognizer.Grammars.Contains(_dateAndTimeGrammar))
                 {
                     _recognizer.LoadGrammar(_dateAndTimeGrammar);
-                    _recognizer.LoadGrammar(_birthdayGrammar);
                     Talk("Yes Eric?");
                     return;
                 }
@@ -125,34 +152,25 @@ namespace HAL
                 }
             }
 
-            if (m.Contains("what"))
+            if (e.Result.Grammar == _dateAndTimeGrammar)
             {
-                if (m.Contains("date") || m.Contains("day"))
+                if (m.Contains("what"))
                 {
-                    Talk(DateTime.Now.ToString("D"));
-                }
-                else if (m.Contains("time"))
-                {
-                    Talk(DateTime.Now.ToString("t"));
+                    if (m.Contains("date") || m.Contains("day"))
+                    {
+                        Talk(DateTime.Now.ToString("D"));
+                        return;
+                    }
+
+                    if (m.Contains("time"))
+                    {
+                        Talk(DateTime.Now.ToString("t"));
+                        return;
+                    }
                 }
             }
         }
 
-        private void Talk(string message)
-        {
-            var ss = new SpeechSynthesizer();
-            ss.Speak(message);
-        }
-    }
-
-    public static class GrammerExtensions
-    {
-        public static void Append(this GrammarBuilder gb, params string[] str)
-        {
-            foreach (var s in str)
-            {
-                gb.Append(s);
-            }
-        }
+        #endregion
     }
 }
