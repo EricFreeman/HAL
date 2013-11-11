@@ -28,7 +28,7 @@ namespace HAL.Implementation
 
         private void Log(string message)
         {
-            LogViewer.Text += string.Format("{0} \r\n", message);
+            LogViewer.Text += string.Format("{0} \r\n", message) + "\r\n";
         }
 
         #endregion

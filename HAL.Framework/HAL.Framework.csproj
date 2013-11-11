@@ -38,15 +38,20 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config.cs" />
     <Compile Include="Extensions\BoolExtensions.cs" />
     <Compile Include="Extensions\GrammarExtensions.cs" />
     <Compile Include="Computer.cs" />
+    <Compile Include="Extensions\ModuleExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Modules\IModule.cs" />
     <Compile Include="Modules\ModuleFactory.cs" />
+    <Compile Include="Modules\StartListeningModule.cs" />
+    <Compile Include="Modules\StopListeningModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Speech" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

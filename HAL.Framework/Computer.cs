@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
 using HAL.Framework.Extensions;
@@ -12,17 +13,24 @@ namespace HAL.Framework
 
         private readonly SpeechRecognitionEngine _recognizer;
 
+        private List<IModule> _lockedModules { get; set; }
         private List<IModule> _modules { get; set; }
         private List<IModule> _possibleModules { get; set; }
 
-        private readonly Grammar _startGrammar;
-        private readonly Grammar _endGrammar;
-
-        private const string _computerName = "HAL";
-        private const string _userName = "Eric";
-
-        private const string _stopListening = "stop listening";
-        private const string _stopListeningMessage = "Goodbye " + _userName;
+        private IModule _startListeningModule
+        {
+            get
+            {
+                return _lockedModules.FirstOrDefault(x => x is StartListeningModule);
+            }
+        }
+        private IModule _stopListeningModule
+        {
+            get
+            {
+                return _lockedModules.FirstOrDefault(x => x is StopListeningModule);
+            }
+        }
 
         #endregion
 
@@ -30,41 +38,35 @@ namespace HAL.Framework
 
         public Computer()
         {
-            _recognizer = new SpeechRecognitionEngine();
-            _recognizer.SetInputToDefaultAudioDevice();
+            #region Initialize Variables
 
+            _lockedModules = new List<IModule>();
             _modules = new List<IModule>();
             _possibleModules = new List<IModule>();
 
-            _startGrammar = CreateStartGrammar();
-            _endGrammar = CreateEndGrammar();
+            #endregion
 
-            _recognizer.LoadGrammar(_startGrammar);
-            _recognizer.LoadGrammar(_endGrammar);
+            #region Setup Recognizer
+
+            _recognizer = new SpeechRecognitionEngine();
+            _recognizer.SetInputToDefaultAudioDevice();
 
             _recognizer.SpeechRecognized += recognizer_SpeechRecognized;
             _recognizer.SpeechHypothesized += recognizer_SpeechHypothesized;
+
+            #endregion
+
+            #region Setup Locked Modules
+
+            _lockedModules.Add(ModuleFactory.CreateModule<StartListeningModule>());
+            _lockedModules.Add(ModuleFactory.CreateModule<StopListeningModule>());
+
+            foreach (var l in _lockedModules)
+                _recognizer.LoadGrammar(l.Grammar);
+
             _recognizer.RecognizeAsync(RecognizeMode.Multiple);
-        }
 
-        #endregion
-
-        #region Setup
-
-        private Grammar CreateStartGrammar()
-        {
-            var b = new GrammarBuilder();
-            b.Append(_computerName);
-
-            return new Grammar(b);
-        }
-
-        private Grammar CreateEndGrammar()
-        {
-            var b = new GrammarBuilder();
-            b.Append("stop listening");
-
-            return new Grammar(b);
+            #endregion
         }
 
         #endregion
@@ -133,21 +135,35 @@ namespace HAL.Framework
         {
             var m = e.Result.Text.ToLower();
 
-            if (!_isLoaded && m.Contains(_computerName.ToLower()))
-            {
-                LoadAllModules();
+            #region Start Listening
 
-                Talk("Yes " + _userName + "?");
-                return;
+            if (!_isLoaded)
+            {
+                var s = _startListeningModule.Match(m, LoadAllModules);
+
+                if (s.IsNotEmpty())
+                {
+                    Talk(s);
+                    return;
+                }
             }
 
-            if (_isLoaded && m.Contains(_stopListening))
-            {
-                UnloadAllModules();
+            #endregion
 
-                Talk(_stopListeningMessage);
-                return;
+            #region Stop Listening
+
+            if (_isLoaded)
+            {
+                var s = _stopListeningModule.Match(m, UnloadAllModules);
+
+                if (s.IsNotEmpty())
+                {
+                    Talk(s);
+                    return;
+                }
             }
+
+            #endregion
 
             foreach (var mod in _modules)
             {
