@@ -1,6 +1,6 @@
 ﻿using System.Speech.Recognition;
 
-namespace Hal.Extensions
+namespace HAL.Framework.Extensions
 {
     public static class GrammerExtensions
     {
