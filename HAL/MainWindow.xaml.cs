@@ -16,6 +16,7 @@ namespace HAL.Implementation
 
         public MainWindow()
         {
+            //test to see if github ssh keys are setup correctly
             InitializeComponent();
 
             _hal = new Computer();
