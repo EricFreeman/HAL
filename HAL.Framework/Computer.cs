@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
+using HAL.Framework.Extensions;
 using HAL.Framework.Modules;
 
 namespace HAL.Framework
@@ -151,7 +152,7 @@ namespace HAL.Framework
             foreach (var mod in _modules)
             {
                 string s = mod.Match(m);
-                if (!string.IsNullOrEmpty(s))
+                if (s.IsNotEmpty())
                 {
                     Talk(s);
                     return;

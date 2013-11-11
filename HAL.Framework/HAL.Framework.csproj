@@ -38,8 +38,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\BoolExtensions.cs" />
     <Compile Include="Extensions\GrammarExtensions.cs" />
     <Compile Include="Computer.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Modules\IModule.cs" />
     <Compile Include="Modules\ModuleFactory.cs" />
   </ItemGroup>
