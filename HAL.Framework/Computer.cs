@@ -137,14 +137,14 @@ namespace HAL.Framework
 
             #region Start Listening
 
-            if (!_isLoaded)
+            if (e.Result.Grammar == _startListeningModule.Grammar)
             {
-                var s = _startListeningModule.Match(m, LoadAllModules);
-
-                if (s.IsNotEmpty())
+                if (!_isLoaded)
                 {
-                    Talk(s);
-                    return;
+                    var s = _startListeningModule.Match(m, LoadAllModules);
+
+                    if (s.IsNotEmpty())
+                        Talk(s);
                 }
             }
 
@@ -152,28 +152,33 @@ namespace HAL.Framework
 
             #region Stop Listening
 
-            if (_isLoaded)
+            else if (e.Result.Grammar == _stopListeningModule.Grammar)
             {
-                var s = _stopListeningModule.Match(m, UnloadAllModules);
-
-                if (s.IsNotEmpty())
+                if (_isLoaded)
                 {
-                    Talk(s);
-                    return;
+                    var s = _stopListeningModule.Match(m, UnloadAllModules);
+
+                    if (s.IsNotEmpty())
+                        Talk(s);
                 }
             }
 
             #endregion
 
-            foreach (var mod in _modules)
+            #region Check Modules
+
+            else
             {
-                string s = mod.Match(m);
-                if (s.IsNotEmpty())
-                {
-                    Talk(s);
-                    return;
-                }
+                var mod = _modules.FirstOrDefault(x => x.Grammar == e.Result.Grammar);
+                string response = mod != null ? mod.Match(m) : string.Empty;
+
+                if (response.IsNotEmpty())
+                    Talk(response);
+                else
+                    Talk("I'm sorry, can you try saying that again?");
             }
+
+            #endregion
         }
 
         #endregion

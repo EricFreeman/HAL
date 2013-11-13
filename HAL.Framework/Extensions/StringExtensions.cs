@@ -11,5 +11,16 @@
         {
             return !string.IsNullOrEmpty(s);
         }
+
+        public static bool ContainsOneOf(this string s, params string[] param)
+        {
+            foreach (var p in param)
+            {
+                if (s.Contains(p))
+                    return true;
+            }
+
+            return false;
+        }
     }
 }
