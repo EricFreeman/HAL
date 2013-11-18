@@ -164,6 +164,8 @@ namespace HAL.Implementation.Modules
             return string.Empty;
         }
 
+        #region Yahoo API stuff
+
         private XDocument GetWeatherData()
         {
             var query = String.Format("http://weather.yahooapis.com/forecastrss?w={0}", GetWoeid(Config.Location));
@@ -178,5 +180,7 @@ namespace HAL.Implementation.Modules
          
             return (from i in thisDoc.Descendants(ns + "place") select i.Element(ns + "woeid").Value).First();
         }
+
+        #endregion
     }
 }

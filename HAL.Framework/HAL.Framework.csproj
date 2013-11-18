@@ -43,6 +43,7 @@
     <Compile Include="Extensions\GrammarExtensions.cs" />
     <Compile Include="Computer.cs" />
     <Compile Include="Extensions\ModuleExtensions.cs" />
+    <Compile Include="Extensions\ModuleFactoryExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Modules\IModule.cs" />
     <Compile Include="Modules\ModuleFactory.cs" />

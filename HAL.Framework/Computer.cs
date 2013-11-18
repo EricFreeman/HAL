@@ -58,8 +58,8 @@ namespace HAL.Framework
 
             #region Setup Locked Modules
 
-            _lockedModules.Add(ModuleFactory.CreateModule<StartListeningModule>());
-            _lockedModules.Add(ModuleFactory.CreateModule<StopListeningModule>());
+            _lockedModules.Add<StartListeningModule>();
+            _lockedModules.Add<StopListeningModule>();
 
             foreach (var l in _lockedModules)
                 _recognizer.LoadGrammar(l.Grammar);
@@ -72,6 +72,12 @@ namespace HAL.Framework
         #endregion
 
         #region Module Support
+
+        public bool LoadModule<T>() where T : IModule, new()
+        {
+            IModule m = ModuleFactory.CreateModule<T>();
+            return LoadModule(m);
+        }
 
         public bool LoadModule(IModule m)
         {
@@ -121,6 +127,11 @@ namespace HAL.Framework
         private bool _isLoaded
         {
             get { return _modules.Count > 0; }
+        }
+
+        public void FeedInput(string input)
+        {
+            _recognizer.EmulateRecognize(input);
         }
 
         #endregion

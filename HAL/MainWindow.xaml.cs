@@ -19,8 +19,8 @@ namespace HAL.Implementation
             InitializeComponent();
 
             _hal = new Computer();
-            _hal.LoadModule(ModuleFactory.CreateModule<DateAndTimeModule>());
-            _hal.LoadModule(ModuleFactory.CreateModule<WeatherModule>());
+            _hal.LoadModule<DateAndTimeModule>();
+            _hal.LoadModule<WeatherModule>();
         }
 
         #endregion
