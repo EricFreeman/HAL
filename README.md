@@ -1,2 +1,3 @@
 HAL
 ===
+Testing grounds for a voice controlled system that uses custom modules you can load up to do different things.  Currently HAL can just tell you the time and the weather.  One day he will also control my house if I ever find the time to experiment with the cool z-wave and arduino devices I want...
