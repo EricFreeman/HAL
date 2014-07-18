@@ -1,5 +1,4 @@
-﻿using System.Configuration;
-using System.Speech.Recognition;
+﻿using System.Speech.Recognition;
 
 namespace HAL.Framework.Modules
 {

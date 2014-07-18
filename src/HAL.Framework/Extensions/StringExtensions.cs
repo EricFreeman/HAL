@@ -1,4 +1,7 @@
-﻿namespace HAL.Framework.Extensions
+﻿using System.Linq;
+using System.Speech.Synthesis;
+
+namespace HAL.Framework.Extensions
 {
     public static class StringExtensions
     {
@@ -14,13 +17,13 @@
 
         public static bool ContainsOneOf(this string s, params string[] param)
         {
-            foreach (var p in param)
-            {
-                if (s.Contains(p))
-                    return true;
-            }
+            return param.Any(s.Contains);
+        }
 
-            return false;
+        public static void Talk(this string s)
+        {
+            var ss = new SpeechSynthesizer();
+            ss.Speak(s);
         }
     }
 }

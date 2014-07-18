@@ -120,6 +120,8 @@ namespace HAL.Framework
 
         private void Talk(string message)
         {
+            if (message.IsEmpty()) return;
+
             var ss = new SpeechSynthesizer();
             ss.Speak(message);
         }
@@ -146,50 +148,22 @@ namespace HAL.Framework
         {
             var m = e.Result.Text.ToLower();
 
-            #region Start Listening
-
-            if (e.Result.Grammar == _startListeningModule.Grammar)
+            // Always check for locked modules (start/stop listening)
+            // else check for other loaded modules
+            if (e.Result.Grammar == _startListeningModule.Grammar && !_isLoaded)
             {
-                if (!_isLoaded)
-                {
-                    var s = _startListeningModule.Match(m, LoadAllModules);
-
-                    if (s.IsNotEmpty())
-                        Talk(s);
-                }
+                _startListeningModule.Match(m, LoadAllModules).Talk();
             }
-
-            #endregion
-
-            #region Stop Listening
-
-            else if (e.Result.Grammar == _stopListeningModule.Grammar)
+            else if (e.Result.Grammar == _stopListeningModule.Grammar && _isLoaded)
             {
-                if (_isLoaded)
-                {
-                    var s = _stopListeningModule.Match(m, UnloadAllModules);
-
-                    if (s.IsNotEmpty())
-                        Talk(s);
-                }
+                _stopListeningModule.Match(m, UnloadAllModules).Talk();
             }
-
-            #endregion
-
-            #region Check Modules
-
             else
             {
                 var mod = _modules.FirstOrDefault(x => x.Grammar == e.Result.Grammar);
-                string response = mod != null ? mod.Match(m) : string.Empty;
-
-                if (response.IsNotEmpty())
-                    Talk(response);
-                else
-                    Talk("I'm sorry, can you try saying that again?");
+                var response = mod != null ? mod.Match(m) : string.Empty;
+                Talk(response.IsNotEmpty() ? response : "I'm sorry, can you try saying that again?");
             }
-
-            #endregion
         }
 
         #endregion

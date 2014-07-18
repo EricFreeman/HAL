@@ -69,19 +69,13 @@ namespace HAL.Implementation.Modules
 
         public string Match(string message)
         {
-            if (message.Contains("time"))
-            {
-                return DateTime.Now.ToString("t");
-            }
+            if (message.Contains("time")) return DateTime.Now.ToString("t");
 
             if(message.ContainsOneOf("today", "tomorrow", "date", "day"))
             {
-                if(message.Contains("today"))
-                    return DateTime.Now.ToString("D");
-                else if (message.Contains("tomorrow"))
-                    return DateTime.Now.AddDays(1).ToString("D");
-                else if (message.Contains("yesterday"))
-                    return DateTime.Now.AddDays(-1).ToString("D");
+                if(message.Contains("today")) return DateTime.Now.ToString("D");
+                if (message.Contains("tomorrow")) return DateTime.Now.AddDays(1).ToString("D");
+                if (message.Contains("yesterday")) return DateTime.Now.AddDays(-1).ToString("D");
             }
 
             return string.Empty;
